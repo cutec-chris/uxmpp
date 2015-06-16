@@ -49,6 +49,25 @@ type
   TPresenceEvent= procedure(Sender:TObject;Presence_Type,JID,Resource,Status,Photo : string) of object;
   TIqVcardEvent = procedure(Sender:TObject; from_, to_, fn_, photo_type_, photo_bin_ : string) of object;
 
+  { TimerThread }
+
+  { TTimerThread }
+
+  TTimerThread = class(TThread)
+  private
+    FEnabled: Boolean;
+    FInterval: Integer;
+    FOnTimer: TNotifyEvent;
+    procedure DoOnTimer;
+    procedure SetEnabled(AValue: Boolean);
+  public
+    constructor Create;
+    procedure Execute; override;
+    property OnTimer : TNotifyEvent read FOnTimer write FOnTimer;
+    property Interval : Integer read FInterval write FInterval;
+    property Enabled : Boolean read FEnabled write SetEnabled;
+  end;
+
   TXmpp=class
   private
     FSocket:TTCPClient;
@@ -78,6 +97,7 @@ type
     FOnChat:TChatMessageEvent;
 //    FOnOfflineMsg:TOfflineMessageEvent;
     FOnRoster:TRosterEvent;
+    FTimer: TTimerThread;
 
     FOnJoinedRoom,
     FOnLeftRoom:TRoomPresence;
@@ -86,7 +106,6 @@ type
     FOnIqVcard  : TIqVcardEvent;
 
     FRoomRoster:TStringList;
-    FTimer:TTimer;
     FOnRoomList:TRoomListEvent;
 
     FCurrentID:string; // just test
@@ -190,6 +209,35 @@ uses
   saslauth,
   synautil;
 
+{ TimerThread }
+
+procedure TTimerThread.DoOnTimer;
+begin
+  if Assigned(FOnTimer) then
+    FOnTimer(Self);
+end;
+
+procedure TTimerThread.SetEnabled(AValue: Boolean);
+begin
+  if FEnabled=AValue then Exit;
+  FEnabled:=AValue;
+end;
+
+constructor TTimerThread.Create;
+begin
+  inherited Create(False);
+end;
+
+procedure TTimerThread.Execute;
+begin
+  while not Terminated do
+    begin
+      sleep(FInterval);
+      if FEnabled then
+        Synchronize(DoOnTimer);
+    end;
+end;
+
 { TXmpp }
 
 constructor TXmpp.Create;
@@ -210,7 +258,7 @@ begin
   FSocket.OnAfterUpgradedToSSL := DoAfterUpgradedToSSL;
   FSocket.OnSSLFailed := DoOnSSLFailed;
 
-  FTimer := TTimer.Create(nil);
+  FTimer := TTimerThread.Create;
   FTimer.Interval := 1000 * 60;
   FTimer.OnTimer := DoOnTimer;
   FTimer.Enabled := False;

@@ -59,6 +59,9 @@
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="11"/>
+    <Target>
+      <Filename Value="dxmpp"/>
+    </Target>
     <SearchPaths>
       <IncludeFiles Value="../source/tcpsynapse;../source"/>
     </SearchPaths>

@@ -8,7 +8,7 @@
         <Filename Value="dxmpp.dpr"/>
         <IsPartOfProject Value="True"/>
         <CursorPos Y="13"/>
-        <UsageCount Value="21"/>
+        <UsageCount Value="22"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit0>
@@ -22,7 +22,7 @@
         <EditorIndex Value="1"/>
         <TopLine Value="92"/>
         <CursorPos X="23" Y="92"/>
-        <UsageCount Value="21"/>
+        <UsageCount Value="22"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
@@ -45,10 +45,10 @@
         <UnitName Value="uxmpp"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <CursorPos X="32" Y="25"/>
+        <TopLine Value="220"/>
+        <CursorPos Y="224"/>
         <UsageCount Value="21"/>
         <Loaded Value="True"/>
-        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit4>
       <Unit5>
         <Filename Value="/tail/home/noch/github/uxmpp/source/uxmpp.pas"/>
@@ -73,7 +73,7 @@
         <Loaded Value="True"/>
       </Unit7>
     </Units>
-    <JumpHistory Count="14" HistoryIndex="13">
+    <JumpHistory Count="27" HistoryIndex="26">
       <Position1>
         <Filename Value="dxmpp.dpr"/>
       </Position1>
@@ -129,6 +129,58 @@
         <Filename Value="../source/tcpsynapse.pas"/>
         <Caret Line="13" Column="35"/>
       </Position14>
+      <Position15>
+        <Filename Value="../source/uxmpp.pas"/>
+        <Caret Line="25" Column="32" TopLine="25"/>
+      </Position15>
+      <Position16>
+        <Filename Value="../source/uxmpp.pas"/>
+        <Caret Line="28" Column="17" TopLine="39"/>
+      </Position16>
+      <Position17>
+        <Filename Value="../source/uxmpp.pas"/>
+        <Caret Line="56" Column="23" TopLine="35"/>
+      </Position17>
+      <Position18>
+        <Filename Value="../source/uxmpp.pas"/>
+        <Caret Line="60" Column="66" TopLine="42"/>
+      </Position18>
+      <Position19>
+        <Filename Value="../source/uxmpp.pas"/>
+        <Caret Line="57" Column="15" TopLine="42"/>
+      </Position19>
+      <Position20>
+        <Filename Value="../source/uxmpp.pas"/>
+        <Caret Line="63" Column="62" TopLine="45"/>
+      </Position20>
+      <Position21>
+        <Filename Value="../source/uxmpp.pas"/>
+        <Caret Line="224" Column="19" TopLine="209"/>
+      </Position21>
+      <Position22>
+        <Filename Value="../source/uxmpp.pas"/>
+        <Caret Line="54" Column="4" TopLine="38"/>
+      </Position22>
+      <Position23>
+        <Filename Value="../source/uxmpp.pas"/>
+        <Caret Line="219" Column="12" TopLine="211"/>
+      </Position23>
+      <Position24>
+        <Filename Value="../source/uxmpp.pas"/>
+        <Caret Line="248" Column="3" TopLine="234"/>
+      </Position24>
+      <Position25>
+        <Filename Value="../source/uxmpp.pas"/>
+        <Caret Line="96" TopLine="81"/>
+      </Position25>
+      <Position26>
+        <Filename Value="../source/uxmpp.pas"/>
+        <Caret Line="249" Column="32" TopLine="236"/>
+      </Position26>
+      <Position27>
+        <Filename Value="../source/uxmpp.pas"/>
+        <Caret Line="68" Column="63" TopLine="41"/>
+      </Position27>
     </JumpHistory>
   </ProjectSession>
   <Debugging>
@@ -138,7 +190,7 @@
         <WatchScope Value="wpsLocal"/>
         <WatchKind Value="wpkWrite"/>
         <Source Value="../source/uxmpp.pas"/>
-        <Line Value="806"/>
+        <Line Value="854"/>
       </Item1>
     </BreakPoints>
   </Debugging>
