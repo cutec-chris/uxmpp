@@ -10,7 +10,7 @@
 unit uxmpp;
 
 {$IFDEF FPC}
-{$MODE DELPHI}{$H+}
+{.$MODE DELPHI}{$H+}
 {$ENDIF}
 
 // uncomment this line to debug xml line by line...
@@ -68,7 +68,10 @@ type
     property Enabled : Boolean read FEnabled write SetEnabled;
   end;
 
+  { TXmpp }
+
   TXmpp=class
+    procedure FSocketConnectFailed(Sender: TObject; Value: string);
   private
     FSocket:TTCPClient;
     FHost,FPort,
@@ -207,7 +210,8 @@ implementation
 uses
   xmppconst,
   saslauth,
-  synautil;
+  synautil,
+  ssl_openssl;
 
 { TimerThread }
 
@@ -234,7 +238,7 @@ begin
     begin
       sleep(FInterval);
       if FEnabled then
-        Synchronize(DoOnTimer);
+        Synchronize({$ifdef fpc}@{$endif}DoOnTimer);
     end;
 end;
 
@@ -251,16 +255,17 @@ begin
   FRoomRoster := TStringList.Create;
 
   FSocket := TTCPClient.Create;
-  FSocket.OnConnected := DoOnConnected;
-  FSocket.OnDisconnected := DoOnDisconnected;
-  FSocket.OnData := DoOnDebugXML;
-  FSocket.OnError := DoOnError;
-  FSocket.OnAfterUpgradedToSSL := DoAfterUpgradedToSSL;
-  FSocket.OnSSLFailed := DoOnSSLFailed;
+  FSocket.OnConnected := {$ifdef fpc}@{$endif}DoOnConnected;
+  FSocket.OnDisconnected := {$ifdef fpc}@{$endif}DoOnDisconnected;
+  FSocket.OnData := {$ifdef fpc}@{$endif}DoOnDebugXML;
+  FSocket.OnError := {$ifdef fpc}@{$endif}DoOnError;
+  FSocket.OnAfterUpgradedToSSL := {$ifdef fpc}@{$endif}DoAfterUpgradedToSSL;
+  FSocket.OnSSLFailed := {$ifdef fpc}@{$endif}DoOnSSLFailed;
+  FSocket.OnConnectFailed:={$ifdef fpc}@{$endif}FSocketConnectFailed;
 
   FTimer := TTimerThread.Create;
   FTimer.Interval := 1000 * 60;
-  FTimer.OnTimer := DoOnTimer;
+  FTimer.OnTimer := {$ifdef fpc}@{$endif}DoOnTimer;
   FTimer.Enabled := False;
 
 end;
@@ -268,6 +273,7 @@ end;
 destructor TXmpp.Destroy;
 begin
   Logout;
+  FTimer.WaitFor;
   FTimer.Free;
   FRoomRoster.Free;
   FParser.Clear;
@@ -323,6 +329,11 @@ begin
     SendCommand('</stream:stream>');
   end else
   FSocket.Disconnect;
+end;
+
+procedure TXmpp.FSocketConnectFailed(Sender: TObject; Value: string);
+begin
+  DoOnDisconnected(Self);
 end;
 
 procedure TXmpp.DoOnConnected(Sender:TObject);

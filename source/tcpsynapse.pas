@@ -9,7 +9,7 @@
 unit tcpsynapse;
 
 {$IFDEF FPC}
-{$MODE DELPHI}{$H+}
+{.$MODE DELPHI}{$H+}
 {$ENDIF}
 
 interface
@@ -39,6 +39,8 @@ type
     Data:string;
   end;
 
+  { TTCPThread }
+
   TTCPThread=class(TThread)
   private
     sock:TTCPBlockSocket;
@@ -48,6 +50,7 @@ type
     FIsConnected:Boolean; // internal check
   protected
     procedure Execute;override;
+    procedure DoSync(Meth : TThreadMethod);
     procedure DoAfterConnect(Sender:TObject);
     procedure SyncOnConnect;
     procedure SyncOnDisconnect;
@@ -126,8 +129,8 @@ begin
   FOwner := AOwner;
   FIsConnected := False;
   sock := TTCPBlockSocket.CreateWithSSL(TSSLOpenSSL);
-  sock.OnAfterConnect := DoAfterConnect;
-  sock.OnStatus := SockCallback;
+  sock.OnAfterConnect := {$ifdef fpc}@{$endif}DoAfterConnect;
+  sock.OnStatus := {$ifdef fpc}@{$endif}SockCallback;
 end;
 
 destructor TTCPThread.Destroy;
@@ -145,7 +148,7 @@ begin
       begin
         if FIsConnected then begin
           FIsConnected := False;
-          Synchronize(SyncOnDisconnect);
+          DoSync(@SyncOnDisconnect);
         end;
       end;
     HR_Error:
@@ -153,7 +156,7 @@ begin
         if (not FIsConnected) then Exit;
         if Length(Value)>0 then begin
           FErrMsg := Value;
-          Synchronize(SyncOnError);
+          DoSync(@SyncOnError);
         end;
       end;
   end;
@@ -162,7 +165,7 @@ end;
 procedure TTCPThread.DoAfterConnect(Sender: TObject);
 begin
   FIsConnected := True;
-  Synchronize(SyncOnConnect);
+  DoSync(@SyncOnConnect);
 end;
 
 procedure TTCPThread.SyncOnConnect;
@@ -238,7 +241,7 @@ begin
         sock.Connect(J.Info.Host,J.Info.Port);
         if (sock.LastError<>0) then begin
           FErrMsg := IntToStr(sock.LastError)+','+sock.LastErrorDesc;
-          Synchronize(SyncOnConnectFailed);
+          DoSync(@SyncOnConnectFailed);
         end else
         while (sock.LastError=0) and (not Terminated) do
         begin
@@ -254,11 +257,11 @@ begin
                 begin
                   sock.SSLDoConnect;
                   if sock.SSL.LastError=0 then
-                    Synchronize(SyncAfterUpgradedToSSL)
+                    DoSync(@SyncAfterUpgradedToSSL)
                   else begin
                     FErrMsg := sock.SSL.LastErrorDesc;
                     if Length(FErrMsg)>0 then
-                      Synchronize(SyncOnSSLFailed);
+                      DoSync(@SyncOnSSLFailed);
                   end;
                 end;
               tsData:
@@ -270,7 +273,7 @@ begin
           begin
             FData:= sock.RecvPacket(0);
             if (sock.LastError=0) and (Length(FData)>0) then
-              Synchronize(SyncOnData);
+              DoSync(@SyncOnData);
           end;
         end;
         sock.CloseSocket;
@@ -279,6 +282,15 @@ begin
     end else
     Sleep(200);
   end;
+end;
+
+procedure TTCPThread.DoSync(Meth: TThreadMethod);
+begin
+  {$ifdef LCL}
+  Synchronize(Meth);
+  {$else}
+  Meth;
+  {$endif}
 end;
 
 procedure TTCPThread.SyncOnConnectFailed;
