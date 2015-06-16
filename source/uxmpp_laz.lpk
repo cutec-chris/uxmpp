@@ -6,10 +6,10 @@
     <CompilerOptions>
       <Version Value="11"/>
       <SearchPaths>
-        <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)/"/>
+        <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
     </CompilerOptions>
-    <Files Count="5">
+    <Files Count="6">
       <Item1>
         <Filename Value="libxmlparser.pas"/>
         <UnitName Value="libxmlparser"/>
@@ -30,6 +30,10 @@
         <Filename Value="xmppconst.pas"/>
         <UnitName Value="xmppconst"/>
       </Item5>
+      <Item6>
+        <Filename Value="tcpsynapse.pas"/>
+        <UnitName Value="tcpsynapse"/>
+      </Item6>
     </Files>
     <RequiredPkgs Count="2">
       <Item1>

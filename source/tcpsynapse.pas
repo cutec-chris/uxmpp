@@ -21,7 +21,7 @@ type
   TTCPClient=class;
 
   TProxyType = (pHTTP, pSocks5);
-  
+
   THostInfo = record
     Host,
     Port,
@@ -234,7 +234,7 @@ begin
                 end;
             end;
           end;
-        end;         
+        end;
         sock.Connect(J.Info.Host,J.Info.Port);
         if (sock.LastError<>0) then begin
           FErrMsg := IntToStr(sock.LastError)+','+sock.LastErrorDesc;
@@ -336,7 +336,7 @@ procedure TTCPClient.Connect;
 var C:TTCPCommand;
 begin
   if FConnected then
-    Exit; 
+    Exit;
   C := TTCPCommand.Create;
   with C.Info do begin
     Host := FHost;
@@ -409,3 +409,4 @@ begin
 end;
 
 end.
+

@@ -22,7 +22,7 @@ uses
   {$IFDEF WIN32}
   Windows,
   {$ENDIF}
-  Classes, SysUtils, tcpsynapse, xmltag, ExtCtrls;
+  Classes, SysUtils, tcpsynapse, xmltag;
 
 type
   TMessageType  = (mtRoom,mtPersonal);
