@@ -60,6 +60,7 @@ type
     FOnTimer: TNotifyEvent;
     procedure DoOnTimer;
     procedure SetEnabled(AValue: Boolean);
+    procedure DoSync(Meth : TThreadMethod);
   public
     constructor Create;
     procedure Execute; override;
@@ -227,6 +228,15 @@ begin
   FEnabled:=AValue;
 end;
 
+procedure TTimerThread.DoSync(Meth: TThreadMethod);
+begin
+  {$ifdef LCL}
+  Synchronize(Meth);
+  {$else}
+  Meth;
+  {$endif}
+end;
+
 constructor TTimerThread.Create;
 begin
   inherited Create(False);
@@ -238,7 +248,7 @@ begin
     begin
       sleep(FInterval);
       if FEnabled then
-        Synchronize({$ifdef fpc}@{$endif}DoOnTimer);
+        DoSync({$ifdef fpc}@{$endif}DoOnTimer);
     end;
 end;
 
@@ -264,7 +274,7 @@ begin
   FSocket.OnConnectFailed:={$ifdef fpc}@{$endif}FSocketConnectFailed;
 
   FTimer := TTimerThread.Create;
-  FTimer.Interval := 1000 * 60;
+  FTimer.Interval := 1000 * 30;
   FTimer.OnTimer := {$ifdef fpc}@{$endif}DoOnTimer;
   FTimer.Enabled := False;
 
