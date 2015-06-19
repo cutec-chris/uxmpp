@@ -168,6 +168,7 @@ type
     procedure Logout;
 
     procedure SendRoomMessage(MsgText:string);
+    procedure SendPresence(ToJID,Presence_Type, JID, Resource, Status : string);
     procedure SendPersonalMessage(ToJID,MsgText:string);
 
     procedure JoinRoom(RoomName:string);
@@ -357,7 +358,7 @@ begin
     SendXMPPHeader(FHost);
 end;
 
-procedure TXmpp.DoOnDebugXML(Sender: TObject; Value:string);
+procedure TXmpp.DoOnDebugXML(Sender: TObject; Value: String);
 begin
   if Pos('<',Value)>0 then
   begin
@@ -404,6 +405,12 @@ begin
   if Assigned(OnDebugXML) then
     FOnDebugXML(Self,'=> '+XML);
   {$ENDIF}
+end;
+
+procedure TXmpp.SendPresence(ToJID, Presence_Type, JID, Resource, Status: string
+  );
+begin
+  SendCommand('<presence from='''+JID+''' to='''+ToJID+''' type='''+Presence_Type+'''><status>'+Status+'</status></presence>');
 end;
 
 procedure TXmpp.SendXMPPHeader(AHost:string);
