@@ -34,17 +34,11 @@ type
                                 TimeStamp:TDateTime;
                                 MsgType:TMessageType) of object;
 
-{
-  TOfflineMessageEvent = procedure(Sender:TObject;
-                                   From:string;
-                                   MsgText:string;
-                                   MsgHTML:string;
-                                   TimeStamp:TDateTime) of object;
-}
   TErrorEvent   = procedure(Sender:TObject;ErrMsg:string) of object;
   TRoomPresence = procedure(Sender:TObject;JID:string) of object;
   TRoomListEvent= procedure(Sender:TObject;RoomName:string) of object;
   TRosterEvent  = procedure(Sender:TObject;JID,Name,Subscription,Group:string) of object;
+  TFileAcceptEvent = procedure(Sender : TObject;JID,Session,Filename : string;FileSize : Integer;var Accept : Boolean) of object;
 
   TPresenceEvent= procedure(Sender:TObject;Presence_Type,JID,Resource,Status,Photo : string) of object;
   TIqVcardEvent = procedure(Sender:TObject; from_, to_, fn_, photo_type_, photo_bin_ : string) of object;
@@ -74,6 +68,7 @@ type
   TXmpp=class
     procedure FSocketConnectFailed(Sender: TObject; Value: string);
   private
+    FFileAccept: TFileAcceptEvent;
     FSocket:TTCPClient;
     FHost,FPort,
     FUser,FPass,
@@ -192,6 +187,7 @@ type
 
     property OnError:TErrorEvent read FOnError write FOnError;
     property OnMessage:TChatMessageEvent read FOnChat write FOnChat;
+    property OnFileAccept : TFileAcceptEvent read FFileAccept write FFileAccept;
 
 //    property OnOfflineMessage:TOfflineMessageEvent read FOnOfflineMsg write FOnOfflineMsg;
 
@@ -852,6 +848,10 @@ var
 
   server_name, server_type, from_, to_, fn_, photo_type_, photo_bin_ : string;
   vc0, vc1, vc2, vc3, vc4 : TXMLTag;
+  action: String;
+  sid: String;
+  _size: Integer;
+  _Accept : Boolean = false;
 
 begin
   trid := tag.GetAttribute('id');
@@ -891,11 +891,6 @@ begin
         end;
      exit
   end;  //vcard
-
-
-
-
-
 
   if (ty='result') then
   begin
@@ -1001,6 +996,33 @@ begin
           SendCommand('<iq type="get" id="'+GenerateID+'"><query xmlns="'+XMLNS_ROSTER+'"/></iq>');
 
     end; // q<>nil
+
+  end;
+  if (ty='set') then
+  begin
+    q := tag.GetFirstTag('jingle');
+    if (q<>nil) then begin
+      iqfr := tag.GetAttribute('from');
+      action := tag.GetAttribute('action');
+      sid := tag.GetAttribute('sid');
+      vc0 := q.GetFirstTag('content');
+      if Assigned(vc0) then
+        begin
+          vc1 := vc0.GetFirstTag('description');
+          if Assigned(vc1) and (vc1.ChildTags.Count>0) then
+            vc2 := vc1.ChildTags.Tags[0];
+          if Assigned(vc2) then
+            begin
+              vc2 := vc2.GetFirstTag('file');
+              _size := StrToIntDef(vc2.GetFirstTag('size').Data,0);
+              fn_ := vc2.GetFirstTag('name').Data;
+              if Assigned(FFileAccept) then
+                FFileAccept(Self,iqfr,sid,fn_,_size,_Accept);
+              if _Accept then
+                SendCommand('<iq from="'+GetJID+'" id="'+sid+'" to="'+iqfr+'" type="result"></iq>');
+            end;
+        end;
+    end;
 
   end;
 end;
