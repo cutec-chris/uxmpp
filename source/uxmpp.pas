@@ -763,7 +763,7 @@ begin
   c := tag.Data;
   if c<>'' then begin
     s := '<response xmlns="'+XMLNS_SASL+'">';
-    resp := SASLDigestMD5(c,FUser,FPass,FCurServer);
+    resp := SASLDigestMD5(c,SeparateLeft(FUser,'@'),FPass,FCurServer);
     s := s + resp+'</response>';
     FMD5Step := 1;
     SendCommand(s);
@@ -784,7 +784,7 @@ begin
   c := tag.Data;
   if c<>'' then begin
     s := '<response xmlns="'+XMLNS_SASL+'">';
-    resp := SASLCramMD5(c,FUser,FPass);
+    resp := SASLCramMD5(c,SeparateLeft(FUser,'@'),FPass);
     s := s + resp+'</response>';
     FCramMD5Step := 1;
     SendCommand(s);
@@ -796,7 +796,7 @@ procedure TXmpp.SendPLAINAuth;
 var
   s,buf:string;
 begin
-  buf := SASLPlain(FUser,FPass);
+  buf := SASLPlain(SeparateLeft(FUser,'@'),FPass);
   // googletalk
   // <auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='PLAIN'
   // xmlns:ga='http://www.google.com/talk/protocol/auth' ga:client-uses-full-bind-result='true'>bla..bla..</auth>
